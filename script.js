@@ -57,20 +57,61 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 爱心粒子类
     class HeartParticle {
-        constructor(x, y, targetX, targetY) {
-            this.x = x;
-            this.y = y;
-            this.targetX0 = targetX; // 原始目标点
-            this.targetY0 = targetY;
-            this.targetX = targetX;
-            this.targetY = targetY;
-            this.size = 2.5; // 粒子更大
-            this.color = '#ff4b4b';
-            this.velocity = {
-                x: (Math.random() - 0.5) * 2,
-                y: (Math.random() - 0.5) * 2
-            };
-        }
+    constructor(x, y, targetX, targetY, text) {
+        this.x = x;
+        this.y = y;
+        this.targetX0 = targetX;
+        this.targetY0 = targetY;
+        this.targetX = targetX;
+        this.targetY = targetY;
+        this.size = 2.5;
+        this.color = '#ff4b4b';
+        this.velocity = {
+            x: (Math.random() - 0.5) * 2,
+            y: (Math.random() - 0.5) * 2
+        };
+        this.text = text || '爸爸';
+    }
+
+    draw() {
+        heartCtx.save();
+        heartCtx.fillStyle = this.color;
+        heartCtx.font = `${this.size * 6}px Arial`;
+        heartCtx.textAlign = 'center';
+        heartCtx.textBaseline = 'middle';
+        heartCtx.fillText(this.text, this.x, this.y);
+        heartCtx.restore();
+    }
+
+    update() {
+        this.x += this.velocity.x;
+        this.y += this.velocity.y;
+        if (this.x < 0 || this.x > heartCanvas.width) this.velocity.x *= -1;
+        if (this.y < 0 || this.y > heartCanvas.height) this.velocity.y *= -1;
+        const dx = this.targetX - this.x;
+        const dy = this.targetY - this.y;
+        this.x += dx * 0.1;
+        this.y += dy * 0.1;
+    }
+}
+
+// 修改initHeartParticles
+function initHeartParticles() {
+    const names = ['爸爸', '妈妈', '奶奶', '家人']; // 你想显示的名字
+    const heartPoints = createHeartShape();
+    heartParticles = [];
+    for (let i = 0; i < heartPoints.length; i++) {
+        const point = heartPoints[i];
+        const text = names[i % names.length];
+        heartParticles.push(new HeartParticle(
+            Math.random() * heartCanvas.width,
+            Math.random() * heartCanvas.height,
+            point.x,
+            point.y,
+            text
+        ));
+    }
+}
 
         draw() {
             heartCtx.beginPath();
