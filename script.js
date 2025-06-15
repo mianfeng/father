@@ -1,14 +1,37 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const photoFrame = document.querySelector('.photo-frame');
-    const photoUpload = document.getElementById('photo-upload');
-    const shareBtn = document.querySelector('.share-btn');
+    // 获取所有需要的元素
+    const loveBtn = document.querySelector('.love-btn');
     const fireworksBtn = document.querySelector('.fireworks-btn');
     const container = document.querySelector('.container');
     const bigHeartContainer = document.querySelector('.big-heart-container');
     const canvas = document.getElementById('fireworks');
     const heartCanvas = document.getElementById('heartCanvas');
+    const loveMessages = document.querySelector('.love-messages');
+
+    // 检查必要的元素是否存在
+    if (!loveBtn || !fireworksBtn || !container || !bigHeartContainer || !canvas || !heartCanvas || !loveMessages) {
+        console.error('某些必要的元素未找到，请检查HTML结构');
+        return;
+    }
+
     const ctx = canvas.getContext('2d');
     const heartCtx = heartCanvas.getContext('2d');
+
+    // 温馨感谢语列表
+    const messages = [
+        "爸爸，您是我心中最温暖的太阳",
+        "感谢您用坚实的臂膀为我遮风挡雨",
+        "您的笑容是我最珍贵的宝藏",
+        "您教会我勇敢面对生活的挑战",
+        "您的爱是我前进的动力",
+        "感谢您一直以来的默默付出",
+        "您是我心中最伟大的英雄",
+        "您的关怀让我倍感温暖",
+        "感谢您为我撑起一片天",
+        "您的爱让我茁壮成长"
+    ];
+
+    let messageIndex = 0;
 
     // 放大爱心canvas为2400x2400，始终居中
     function resizeCanvas() {
@@ -55,32 +78,28 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // 爱心粒子类（显示罗雨彤）
+    // 爱心粒子类
     class HeartParticle {
-        constructor(x, y, targetX, targetY, text) {
+        constructor(x, y, targetX, targetY) {
             this.x = x;
             this.y = y;
-            this.targetX0 = targetX; // 原始目标点
+            this.targetX0 = targetX;
             this.targetY0 = targetY;
             this.targetX = targetX;
             this.targetY = targetY;
-            this.size = 2.5; // 粒子更大
+            this.size = 2.5;
             this.color = '#ff4b4b';
             this.velocity = {
                 x: (Math.random() - 0.5) * 2,
                 y: (Math.random() - 0.5) * 2
             };
-            this.text = text || '罗雨彤';
         }
 
         draw() {
-            heartCtx.save();
+            heartCtx.beginPath();
+            heartCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
             heartCtx.fillStyle = this.color;
-            heartCtx.font = `${this.size * 6}px Arial`;
-            heartCtx.textAlign = 'center';
-            heartCtx.textBaseline = 'middle';
-            heartCtx.fillText(this.text, this.x, this.y);
-            heartCtx.restore();
+            heartCtx.fill();
         }
 
         update() {
@@ -111,15 +130,14 @@ document.addEventListener('DOMContentLoaded', function() {
     function createHeartShape() {
         const points = [];
         const cx = heartCanvas.width / 2;
-        const cy = heartCanvas.height / 2+50; // 垂直居中
-        const scale = 200; // y方向更长
+        const cy = heartCanvas.height / 2 + 100;
+        const scale = 300;
         let count = 0;
-        const maxPoints = 4000; // 粒子数量
+        const maxPoints = 7000;
         while (count < maxPoints) {
             const x = Math.random() * heartCanvas.width;
             const y = Math.random() * heartCanvas.height;
-            // x方向拉宽1.8倍，y方向加负号正过来
-            if (isInHeart((x - cx) / 1 + cx, -(y - cy) + cy, cx, cy, scale)) {
+            if (isInHeart((x - cx) / 1.2 + cx, -(y - cy) + cy, cx, cy, scale)) {
                 points.push({ x, y });
                 count++;
             }
@@ -128,7 +146,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function initHeartParticles() {
-        const name = '罗雨彤'; // 你想显示的名字
         const heartPoints = createHeartShape();
         heartParticles = [];
         for (let i = 0; i < heartPoints.length; i++) {
@@ -137,8 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 Math.random() * heartCanvas.width,
                 Math.random() * heartCanvas.height,
                 point.x,
-                point.y,
-                name  // 每个粒子都显示“罗雨彤”
+                point.y
             ));
         }
     }
@@ -175,7 +191,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 动画循环
     function animate() {
         requestAnimationFrame(animate);
-
+        
         // 烟花动画
         ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -187,13 +203,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 爱心动画
         heartCtx.clearRect(0, 0, heartCanvas.width, heartCanvas.height);
-        // 跳动缩放因子
         heartTime += 0.05;
         const scale = 1 + 0.15 * Math.sin(heartTime * 2);
         const cx = heartCanvas.width / 2;
         const cy = heartCanvas.height / 2;
         heartParticles.forEach(particle => {
-            // 目标点随scale变化
             particle.targetX = (particle.targetX0 - cx) * scale + cx;
             particle.targetY = (particle.targetY0 - cy) * scale + cy;
             particle.update();
@@ -201,52 +215,37 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 点击照片框触发文件选择
-    photoFrame.addEventListener('click', () => {
-        photoUpload.click();
-    });
-
-    // 处理照片上传
-    photoUpload.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                img.style.maxWidth = '100%';
-                img.style.borderRadius = '8px';
-
-                const placeholder = document.querySelector('.photo-placeholder');
-                placeholder.innerHTML = '';
-                placeholder.appendChild(img);
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-
-    // 分享功能
-    shareBtn.addEventListener('click', function() {
-        if (navigator.share) {
-            navigator.share({
-                title: '父亲节快乐',
-                text: '送给最亲爱的爸爸',
-                url: window.location.href
-            })
-            .catch(error => console.log('分享失败:', error));
-        } else {
-            alert('复制链接分享给爸爸吧！');
-        }
-    });
+    // 点击表达爱意
+    if (loveBtn) {
+        loveBtn.addEventListener('click', function() {
+            if (messageIndex < messages.length) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'love-message';
+                messageDiv.textContent = messages[messageIndex];
+                loveMessages.appendChild(messageDiv);
+                messageIndex++;
+                
+                // 添加动画效果
+                messageDiv.style.opacity = '0';
+                messageDiv.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    messageDiv.style.opacity = '1';
+                    messageDiv.style.transform = 'translateY(0)';
+                }, 10);
+            }
+        });
+    }
 
     // 点击放烟花按钮
-    fireworksBtn.addEventListener('click', function() {
-        container.classList.add('hide');
-        bigHeartContainer.style.display = 'flex';
-        initHeartParticles();
-        startContinuousFireworks();
-    });
+    if (fireworksBtn) {
+        fireworksBtn.addEventListener('click', function() {
+            container.classList.add('hide');
+            bigHeartContainer.style.display = 'flex';
+            initHeartParticles();
+            startContinuousFireworks();
+        });
+    }
 
     // 开始动画
     animate();
-});
+}); 
