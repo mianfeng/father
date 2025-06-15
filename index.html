@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>父亲节快乐</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <canvas id="fireworks"></canvas>
+    <div class="container">
+        <div class="card">
+            <div class="heart"></div>
+            <h1>父亲节快乐</h1>
+            <div class="message">
+                <p>亲爱的爸爸：</p>
+                <p>感谢您一直以来的付出与关爱</p>
+                <p>您是我生命中最重要的人</p>
+                <p>愿您永远健康快乐！</p>
+            </div>
+            <div class="photo-frame">
+                <div class="photo-placeholder">
+                    <p>点击上传照片</p>
+                    <input type="file" id="photo-upload" accept="image/*" hidden>
+                </div>
+            </div>
+            <button class="share-btn">分享给爸爸</button>
+            <button class="fireworks-btn">放烟花</button>
+        </div>
+    </div>
+    <div class="big-heart-container" style="display: none;">
+        <canvas id="heartCanvas"></canvas>
+        <div class="heart-text">父亲节快乐</div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html> 
