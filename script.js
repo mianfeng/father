@@ -55,69 +55,32 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // 爱心粒子类
+    // 爱心粒子类（显示罗雨彤）
     class HeartParticle {
-    constructor(x, y, targetX, targetY, text) {
-        this.x = x;
-        this.y = y;
-        this.targetX0 = targetX;
-        this.targetY0 = targetY;
-        this.targetX = targetX;
-        this.targetY = targetY;
-        this.size = 2.5;
-        this.color = '#ff4b4b';
-        this.velocity = {
-            x: (Math.random() - 0.5) * 2,
-            y: (Math.random() - 0.5) * 2
-        };
-        this.text = text || '爸爸';
-    }
-
-    draw() {
-        heartCtx.save();
-        heartCtx.fillStyle = this.color;
-        heartCtx.font = `${this.size * 6}px Arial`;
-        heartCtx.textAlign = 'center';
-        heartCtx.textBaseline = 'middle';
-        heartCtx.fillText(this.text, this.x, this.y);
-        heartCtx.restore();
-    }
-
-    update() {
-        this.x += this.velocity.x;
-        this.y += this.velocity.y;
-        if (this.x < 0 || this.x > heartCanvas.width) this.velocity.x *= -1;
-        if (this.y < 0 || this.y > heartCanvas.height) this.velocity.y *= -1;
-        const dx = this.targetX - this.x;
-        const dy = this.targetY - this.y;
-        this.x += dx * 0.1;
-        this.y += dy * 0.1;
-    }
-}
-
-// 修改initHeartParticles
-function initHeartParticles() {
-    const names = ['爸爸', '妈妈', '奶奶', '家人']; // 你想显示的名字
-    const heartPoints = createHeartShape();
-    heartParticles = [];
-    for (let i = 0; i < heartPoints.length; i++) {
-        const point = heartPoints[i];
-        const text = names[i % names.length];
-        heartParticles.push(new HeartParticle(
-            Math.random() * heartCanvas.width,
-            Math.random() * heartCanvas.height,
-            point.x,
-            point.y,
-            text
-        ));
-    }
-}
+        constructor(x, y, targetX, targetY, text) {
+            this.x = x;
+            this.y = y;
+            this.targetX0 = targetX; // 原始目标点
+            this.targetY0 = targetY;
+            this.targetX = targetX;
+            this.targetY = targetY;
+            this.size = 2.5; // 粒子更大
+            this.color = '#ff4b4b';
+            this.velocity = {
+                x: (Math.random() - 0.5) * 2,
+                y: (Math.random() - 0.5) * 2
+            };
+            this.text = text || '罗雨彤';
+        }
 
         draw() {
-            heartCtx.beginPath();
-            heartCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            heartCtx.save();
             heartCtx.fillStyle = this.color;
-            heartCtx.fill();
+            heartCtx.font = `${this.size * 6}px Arial`;
+            heartCtx.textAlign = 'center';
+            heartCtx.textBaseline = 'middle';
+            heartCtx.fillText(this.text, this.x, this.y);
+            heartCtx.restore();
         }
 
         update() {
@@ -165,6 +128,7 @@ function initHeartParticles() {
     }
 
     function initHeartParticles() {
+        const name = '罗雨彤'; // 你想显示的名字
         const heartPoints = createHeartShape();
         heartParticles = [];
         for (let i = 0; i < heartPoints.length; i++) {
@@ -173,7 +137,8 @@ function initHeartParticles() {
                 Math.random() * heartCanvas.width,
                 Math.random() * heartCanvas.height,
                 point.x,
-                point.y
+                point.y,
+                name  // 每个粒子都显示“罗雨彤”
             ));
         }
     }
@@ -210,7 +175,7 @@ function initHeartParticles() {
     // 动画循环
     function animate() {
         requestAnimationFrame(animate);
-        
+
         // 烟花动画
         ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -251,7 +216,7 @@ function initHeartParticles() {
                 img.src = e.target.result;
                 img.style.maxWidth = '100%';
                 img.style.borderRadius = '8px';
-                
+
                 const placeholder = document.querySelector('.photo-placeholder');
                 placeholder.innerHTML = '';
                 placeholder.appendChild(img);
@@ -284,4 +249,4 @@ function initHeartParticles() {
 
     // 开始动画
     animate();
-}); 
+});
