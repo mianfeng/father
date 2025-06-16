@@ -6,7 +6,7 @@
 
 body {
     font-family: "Microsoft YaHei", sans-serif;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: linear-gradient(135deg, #f5f7fa 0%, #e0c3fc 100%);
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -63,7 +63,7 @@ body {
     top: 50%;
     transform: translate(-50%, -50%);
     color: white;
-    font-size: 20px;
+    font-size: 40px;
     font-weight: bold;
     text-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
     z-index: 4;
@@ -86,7 +86,7 @@ body {
     right: 20px;
     width: 30px;
     height: 30px;
-    background: #ff4b4b;
+    background: #ff6b8b;
     transform: rotate(45deg);
     animation: heartbeat 1.5s infinite;
 }
@@ -97,7 +97,7 @@ body {
     position: absolute;
     width: 30px;
     height: 30px;
-    background: #ff4b4b;
+    background: #ff6b8b;
     border-radius: 50%;
 }
 
@@ -110,9 +110,17 @@ body {
 }
 
 @keyframes heartbeat {
-    0% { transform: rotate(45deg) scale(1); }
-    50% { transform: rotate(45deg) scale(1.2); }
-    100% { transform: rotate(45deg) scale(1); }
+    0% {
+        transform: rotate(45deg) scale(1);
+    }
+
+    50% {
+        transform: rotate(45deg) scale(1.2);
+    }
+
+    100% {
+        transform: rotate(45deg) scale(1);
+    }
 }
 
 h1 {
@@ -131,8 +139,9 @@ h1 {
     margin: 10px 0;
 }
 
-.share-btn, .fireworks-btn {
-    background: #ff4b4b;
+.share-btn,
+.fireworks-btn {
+    background: #ff6b8b;
     color: white;
     border: none;
     padding: 12px 30px;
@@ -143,10 +152,11 @@ h1 {
     margin: 10px;
 }
 
-.share-btn:hover, .fireworks-btn:hover {
-    background: #ff3333;
+.share-btn:hover,
+.fireworks-btn:hover {
+    background: #ff4b6b;
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(255, 75, 75, 0.3);
+    box-shadow: 0 5px 15px rgba(255, 107, 139, 0.3);
 }
 
 .particle {
@@ -161,6 +171,7 @@ h1 {
         transform: translate(0, 0) scale(1);
         opacity: 1;
     }
+
     100% {
         transform: translate(var(--tx), var(--ty)) scale(0);
         opacity: 0;
@@ -205,17 +216,18 @@ h1 {
 }
 
 .love-message {
-    color: #ff4b4b;
+    color: #ff6b8b;
     font-size: 1.1em;
     margin: 10px 0;
     padding: 10px;
-    background: rgba(255, 75, 75, 0.1);
+    background: rgba(255, 107, 139, 0.1);
     border-radius: 8px;
     transition: all 0.3s ease;
 }
 
-.love-btn, .fireworks-btn {
-    background: #ff4b4b;
+.love-btn,
+.fireworks-btn {
+    background: #ff6b8b;
     color: white;
     border: none;
     padding: 12px 30px;
@@ -226,8 +238,9 @@ h1 {
     margin: 10px;
 }
 
-.love-btn:hover, .fireworks-btn:hover {
-    background: #ff3333;
+.love-btn:hover,
+.fireworks-btn:hover {
+    background: #ff4b6b;
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(255, 75, 75, 0.3);
-} 
+    box-shadow: 0 5px 15px rgba(255, 107, 139, 0.3);
+}
