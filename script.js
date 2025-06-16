@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // 获取所有需要的元素
     const loveBtn = document.querySelector('.love-btn');
     const fireworksBtn = document.querySelector('.fireworks-btn');
@@ -17,18 +17,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const ctx = canvas.getContext('2d');
     const heartCtx = heartCanvas.getContext('2d');
 
-    // 温馨感谢语列表
+    // 道歉语列表
     const messages = [
-        "爸爸，您是我心中最温暖的太阳",
-        "感谢您用坚实的臂膀为我遮风挡雨",
-        "您的笑容是我最珍贵的宝藏",
-        "您教会我勇敢面对生活的挑战",
-        "您的爱是我前进的动力",
-        "感谢您一直以来的默默付出",
-        "您是我心中最伟大的英雄",
-        "您的关怀让我倍感温暖",
-        "感谢您为我撑起一片天",
-        "您的爱让我茁壮成长"
+        "宝贝宝贝对不起",
+        "我是凑凑大麻瓜",
+        "超级巫师美丽大方",
+        "摇了我吧~~",
+        "你是我心中最珍贵的宝贝",
+        "没有你的日子我度日如年",
+        "原谅我的愚蠢和冲动"
     ];
 
     let messageIndex = 0;
@@ -43,6 +40,16 @@ document.addEventListener('DOMContentLoaded', function() {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
+    let particles = [];
+    let heartParticles = [];
+    let textParticles = []; // 添加文字粒子数组
+    let isFireworksActive = false;
+    let fireworksInterval;
+    let heartTime = 0;
+    const MAX_PARTICLES = 5000;
+    const APOLOGY_TEXT = "对不起"; // 道歉文字
+    let currentTextIndex = 0; // 当前显示的文字索引
+
     // 烟花粒子类
     class Particle {
         constructor(x, y, color) {
@@ -50,31 +57,64 @@ document.addEventListener('DOMContentLoaded', function() {
             this.y = y;
             this.color = color;
             this.velocity = {
-                x: (Math.random() - 0.5) * 8,
-                y: (Math.random() - 0.5) * 8
+                x: (Math.random() - 0.5) * 12,
+                y: (Math.random() - 0.5) * 12
             };
             this.alpha = 1;
-            this.friction = 0.95;
-            this.gravity = 0.2;
+            this.friction = 0.96;
+            this.gravity = 0.15;
+            this.size = Math.random() * 3 + 1;
+            this.rotation = Math.random() * Math.PI * 2;
+            this.rotationSpeed = (Math.random() - 0.5) * 0.2;
+            this.trail = [];
+            this.maxTrailLength = 5;
+            this.createdAt = Date.now(); // 记录创建时间
+            this.lifeTime = 3000; // 3秒生命周期
         }
 
         draw() {
             ctx.save();
             ctx.globalAlpha = this.alpha;
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.rotation);
+
+            for (let i = 0; i < this.trail.length; i++) {
+                const pos = this.trail[i];
+                ctx.beginPath();
+                ctx.arc(pos.x - this.x, pos.y - this.y, this.size * (i / this.trail.length), 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.alpha * (i / this.trail.length);
+                ctx.fill();
+            }
+
             ctx.beginPath();
-            ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+            ctx.arc(0, 0, this.size, 0, Math.PI * 2);
             ctx.fillStyle = this.color;
             ctx.fill();
+
             ctx.restore();
         }
 
         update() {
+            // 检查是否超过生命周期
+            if (Date.now() - this.createdAt > this.lifeTime) {
+                return false;
+            }
+
+            this.trail.push({ x: this.x, y: this.y });
+            if (this.trail.length > this.maxTrailLength) {
+                this.trail.shift();
+            }
+
             this.velocity.x *= this.friction;
             this.velocity.y *= this.friction;
             this.velocity.y += this.gravity;
             this.x += this.velocity.x;
             this.y += this.velocity.y;
-            this.alpha -= 0.01;
+            this.alpha -= 0.008;
+            this.rotation += this.rotationSpeed;
+
+            return this.alpha > 0;
         }
     }
 
@@ -87,38 +127,103 @@ document.addEventListener('DOMContentLoaded', function() {
             this.targetY0 = targetY;
             this.targetX = targetX;
             this.targetY = targetY;
-            this.size = 2.5;
-            this.color = '#ff4b4b';
+            this.baseSize = Math.random() * 3 + 1; // 保存基础大小
+            this.size = this.baseSize; // 当前大小
+            this.color = `hsl(${Math.random() * 60 + 330}, 100%, 70%)`;
             this.velocity = {
-                x: (Math.random() - 0.5) * 2,
-                y: (Math.random() - 0.5) * 2
+                x: (Math.random() - 0.5) * 3,
+                y: (Math.random() - 0.5) * 3
             };
+            this.rotation = Math.random() * Math.PI * 2;
+            this.rotationSpeed = (Math.random() - 0.5) * 0.1;
+            this.pulse = Math.random() * 0.2 + 0.9; // 增加初始脉冲范围
+            this.pulseSpeed = Math.random() * 0.06 + 0.02; // 增加脉冲速度
         }
 
         draw() {
+            heartCtx.save();
+            heartCtx.translate(this.x, this.y);
+            heartCtx.rotate(this.rotation);
+
             heartCtx.beginPath();
-            heartCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            heartCtx.moveTo(0, 0);
+            heartCtx.bezierCurveTo(
+                this.size * 2, -this.size * 2,
+                this.size * 3, 0,
+                0, this.size * 3
+            );
+            heartCtx.bezierCurveTo(
+                -this.size * 3, 0,
+                -this.size * 2, -this.size * 2,
+                0, 0
+            );
             heartCtx.fillStyle = this.color;
             heartCtx.fill();
+
+            heartCtx.restore();
         }
 
         update() {
             this.x += this.velocity.x;
             this.y += this.velocity.y;
+
             if (this.x < 0 || this.x > heartCanvas.width) this.velocity.x *= -1;
             if (this.y < 0 || this.y > heartCanvas.height) this.velocity.y *= -1;
+
             const dx = this.targetX - this.x;
             const dy = this.targetY - this.y;
             this.x += dx * 0.1;
             this.y += dy * 0.1;
+
+            this.rotation += this.rotationSpeed;
+
+            this.pulse += this.pulseSpeed;
+            if (this.pulse > 3 || this.pulse < 0.5) { // 扩大脉冲范围
+                this.pulseSpeed *= -1;
+            }
+            this.size = this.baseSize * this.pulse * 2; // 保持2倍缩放
         }
     }
 
-    let particles = [];
-    let heartParticles = [];
-    let isFireworksActive = false;
-    let fireworksInterval;
-    let heartTime = 0;
+    // 文字粒子类
+    class TextParticle {
+        constructor(x, y, text) {
+            this.x = x;
+            this.y = y;
+            this.text = text;
+            this.alpha = 0;
+            this.size = 80; // 文字大小增加到80像素
+            this.createdAt = Date.now();
+            this.lifeTime = 1000; // 1秒生命周期
+        }
+
+        draw() {
+            ctx.save();
+            ctx.globalAlpha = this.alpha;
+            ctx.font = `bold ${this.size}px Arial`; // 添加bold使文字更清晰
+            ctx.fillStyle = '#ffffff'; // 改为白色
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(this.text, this.x, this.y);
+            ctx.restore();
+        }
+
+        update() {
+            const elapsed = Date.now() - this.createdAt;
+            if (elapsed > this.lifeTime) {
+                return false;
+            }
+
+            // 计算透明度：0-500ms淡入，500-1000ms淡出
+            if (elapsed < 500) {
+                this.alpha = elapsed / 500;
+            } else {
+                this.alpha = 1 - (elapsed - 500) / 500;
+            }
+
+            return true;
+        }
+    }
 
     // 随机采样填充整个心形区域，均匀分布
     function isInHeart(x, y, cx, cy, scale) {
@@ -131,7 +236,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const points = [];
         const cx = heartCanvas.width / 2;
         const cy = heartCanvas.height / 2 + 100;
-        const scale = 300;
+        const scale = 400;
         let count = 0;
         const maxPoints = 7000;
         while (count < maxPoints) {
@@ -161,11 +266,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 创建烟花
     function createFirework(x, y) {
-        const colors = ['#ff0000', '#ff4b4b', '#ff6b6b', '#ff8b8b', '#ffabab'];
-        for (let i = 0; i < 100; i++) {
+        const colors = [
+            '#ff6b8b', '#ff8da1', '#ffa5b5', '#ffbdc9', '#ffd5dd',
+            '#ff69b4', '#ff1493', '#ffb6c1', '#ffc0cb', '#db7093'
+        ];
+
+        for (let layer = 0; layer < 3; layer++) {
+            const particleCount = 100 + layer * 50;
             const color = colors[Math.floor(Math.random() * colors.length)];
-            particles.push(new Particle(x, y, color));
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = new Particle(x, y, color);
+                particle.velocity.x *= (1 + layer * 0.5);
+                particle.velocity.y *= (1 + layer * 0.5);
+                particles.push(particle);
+            }
         }
+
+        // 在烟花位置创建文字
+        const text = APOLOGY_TEXT[currentTextIndex];
+        textParticles.push(new TextParticle(x, y, text));
+        currentTextIndex = (currentTextIndex + 1) % APOLOGY_TEXT.length;
     }
 
     // 开始持续放烟花
@@ -185,28 +306,50 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isFireworksActive) {
             isFireworksActive = false;
             clearInterval(fireworksInterval);
+            particles = [];
+            heartParticles = [];
+            textParticles = []; // 清理文字粒子
         }
     }
 
     // 动画循环
     function animate() {
         requestAnimationFrame(animate);
-        
+
         // 烟花动画
         ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        particles = particles.filter(particle => particle.alpha > 0);
-        particles.forEach(particle => {
-            particle.update();
-            particle.draw();
+
+        particles = particles.filter(particle => {
+            const isAlive = particle.update();
+            if (isAlive) {
+                particle.draw();
+            }
+            return isAlive;
+        });
+
+        // 更新和绘制文字
+        textParticles = textParticles.filter(particle => {
+            const isAlive = particle.update();
+            if (isAlive) {
+                particle.draw();
+            }
+            return isAlive;
         });
 
         // 爱心动画
         heartCtx.clearRect(0, 0, heartCanvas.width, heartCanvas.height);
-        heartTime += 0.05;
-        const scale = 1 + 0.15 * Math.sin(heartTime * 2);
+        heartTime += 0.08;
+        const scale = 1 + 0.35 * Math.sin(heartTime * 2);
         const cx = heartCanvas.width / 2;
         const cy = heartCanvas.height / 2;
+
+        const gradient = heartCtx.createRadialGradient(cx, cy, 0, cx, cy, 600);
+        gradient.addColorStop(0, 'rgba(255, 107, 139, 0.1)');
+        gradient.addColorStop(1, 'rgba(255, 107, 139, 0)');
+        heartCtx.fillStyle = gradient;
+        heartCtx.fillRect(0, 0, heartCanvas.width, heartCanvas.height);
+
         heartParticles.forEach(particle => {
             particle.targetX = (particle.targetX0 - cx) * scale + cx;
             particle.targetY = (particle.targetY0 - cy) * scale + cy;
@@ -217,14 +360,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 点击表达爱意
     if (loveBtn) {
-        loveBtn.addEventListener('click', function() {
+        loveBtn.addEventListener('click', function () {
             if (messageIndex < messages.length) {
                 const messageDiv = document.createElement('div');
                 messageDiv.className = 'love-message';
                 messageDiv.textContent = messages[messageIndex];
                 loveMessages.appendChild(messageDiv);
                 messageIndex++;
-                
+
                 // 添加动画效果
                 messageDiv.style.opacity = '0';
                 messageDiv.style.transform = 'translateY(20px)';
@@ -238,7 +381,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 点击放烟花按钮
     if (fireworksBtn) {
-        fireworksBtn.addEventListener('click', function() {
+        fireworksBtn.addEventListener('click', function () {
             container.classList.add('hide');
             bigHeartContainer.style.display = 'flex';
             initHeartParticles();
