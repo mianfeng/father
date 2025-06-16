@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (this.pulse > 3 || this.pulse < 0.5) { // 扩大脉冲范围
                 this.pulseSpeed *= -1;
             }
-            this.size = this.baseSize * this.pulse * 2; // 保持2倍缩放
+            this.size = this.baseSize * this.pulse * 1.3; // 保持2倍缩放
         }
     }
 
@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function () {
             this.y = y;
             this.text = text;
             this.alpha = 0;
-            this.size = 80; // 文字大小增加到80像素
+            this.size = 60; // 文字大小增加到80像素
             this.createdAt = Date.now();
             this.lifeTime = 1000; // 1秒生命周期
         }
@@ -236,7 +236,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const points = [];
         const cx = heartCanvas.width / 2;
         const cy = heartCanvas.height / 2 + 100;
-        const scale = 400;
+        const scale = 200;
         let count = 0;
         const maxPoints = 7000;
         while (count < maxPoints) {
@@ -295,7 +295,7 @@ document.addEventListener('DOMContentLoaded', function () {
             isFireworksActive = true;
             fireworksInterval = setInterval(() => {
                 const x = Math.random() * canvas.width;
-                const y = Math.random() * canvas.height * 0.5;
+                const y = Math.random() * canvas.height * 0.8;
                 createFirework(x, y);
             }, 300);
         }
