@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (this.pulse > 3 || this.pulse < 0.5) { // 扩大脉冲范围
                 this.pulseSpeed *= -1;
             }
-            this.size = this.baseSize * this.pulse * 1.3; // 保持2倍缩放
+            this.size = this.baseSize * this.pulse * 1.2; // 保持2倍缩放
         }
     }
 
